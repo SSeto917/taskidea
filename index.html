@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10120f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="靈感冷卻">
+  <title>靈感冷卻系統</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">冷</span>
+        <div>
+          <p class="eyebrow">IDEA COOLING SYSTEM</p>
+          <h1>靈感冷卻</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <nav class="view-switch" aria-label="主要頁面">
+          <button class="view-button active" type="button" data-view="ideas">靈感</button>
+          <button class="view-button" type="button" data-view="tasks">任務</button>
+        </nav>
+        <div class="focus-indicator"><span></span> 專注模式</div>
+      </div>
+    </header>
+
+    <div id="ideaView">
+    <section class="hero">
+      <div>
+        <p class="step-label green">● STEP 01 — 專注中</p>
+        <h2>先把想法放下，<br><em>繼續眼前的事。</em></h2>
+        <p class="lead">突然有想法？只記錄，不執行。讓靈感先離開腦袋，但不要帶走你的注意力。</p>
+      </div>
+      <div class="current-task-card">
+        <label for="currentTask">現在唯一要做的事</label>
+        <div class="task-input-row">
+          <input id="currentTask" autocomplete="off" placeholder="例如：完成企劃第一版">
+          <button id="finishTask" class="button button-light" type="button">開始專注 →</button>
+        </div>
+        <p id="taskHint" class="microcopy">輸入任務並開始專注；等真的做完後，再按一次按鈕。</p>
+      </div>
+    </section>
+
+    <section class="capture-panel" aria-labelledby="captureTitle">
+      <div class="panel-number">01</div>
+      <div class="capture-content">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">CAPTURE ONLY</p>
+            <h3 id="captureTitle">只記錄，不執行</h3>
+          </div>
+          <span id="inboxCount" class="count-pill">0 個待檢視</span>
+        </div>
+        <form id="captureForm" class="capture-form">
+          <textarea id="ideaInput" rows="2" maxlength="280" placeholder="把突然冒出的點子丟在這裡……" required></textarea>
+          <button class="button button-accent" type="submit">暫存靈感 <span>↵</span></button>
+        </form>
+        <p class="shortcut">按 <kbd>Ctrl</kbd> + <kbd>Enter</kbd> 快速暫存</p>
+      </div>
+    </section>
+
+    <section id="reviewSection" class="review-section hidden" aria-labelledby="reviewTitle">
+      <div class="section-heading">
+        <div>
+          <p class="step-label yellow">● STEP 02 — 任務已完成</p>
+          <h3 id="reviewTitle">現在，再看一眼。</h3>
+        </div>
+        <span id="reviewProgress" class="count-pill"></span>
+      </div>
+      <div id="reviewCard" class="review-card"></div>
+    </section>
+
+    <section class="pipeline" aria-label="靈感處理區">
+      <article id="poolColumn" class="column pool-column">
+        <div class="column-header">
+          <div>
+            <p class="step-label blue">● IDEA POOL</p>
+            <h3>冷卻中的點子</h3>
+          </div>
+          <div class="column-controls">
+            <span id="poolCount" class="big-count">0</span>
+            <button id="togglePool" class="collapse-button" type="button" aria-expanded="true" aria-controls="poolBody"><span>收合</span><b aria-hidden="true">⌃</b></button>
+          </div>
+        </div>
+        <div id="poolBody" class="column-body">
+          <p class="column-intro">仍有興趣的想法先留在這裡。滿 24 小時，才能變成待辦。</p>
+          <div id="poolList" class="item-list"></div>
+        </div>
+      </article>
+
+      <article id="todoColumn" class="column todo-column">
+        <div class="column-header">
+          <div>
+            <p class="step-label purple">● AFTER 24 HOURS</p>
+            <h3>真正想做的事</h3>
+          </div>
+          <div class="column-controls">
+            <span id="todoCount" class="big-count">0</span>
+            <button id="toggleTodo" class="collapse-button" type="button" aria-expanded="true" aria-controls="todoBody"><span>收合</span><b aria-hidden="true">⌃</b></button>
+          </div>
+        </div>
+        <div id="todoBody" class="column-body">
+          <p class="column-intro">冷卻後依然有吸引力，才值得佔據你的行程。</p>
+          <div id="todoList" class="item-list"></div>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      <p>靈感不是命令。先完成，再決定。</p>
+      <div class="footer-actions">
+        <button id="installPwa" class="text-button install-button hidden" type="button">安裝成應用程式</button>
+        <button id="exportData" class="text-button" type="button">匯出備份</button>
+        <label class="text-button" for="importData">匯入備份</label>
+        <input id="importData" type="file" accept="application/json" hidden>
+        <button id="resetData" class="text-button danger" type="button">清除資料</button>
+      </div>
+    </footer>
+    </div>
+
+    <section id="tasksView" class="tasks-view hidden" aria-labelledby="tasksTitle">
+      <div class="tasks-hero">
+        <div>
+          <p class="eyebrow">MISSION CONTROL</p>
+          <h2 id="tasksTitle">我的任務</h2>
+          <p>把固定要做的事，變成看得見的進度。</p>
+        </div>
+        <div class="task-edit-actions">
+          <button id="cancelTaskEdit" class="button button-ghost hidden" type="button">取消</button>
+          <button id="editTasks" class="button button-light" type="button">編輯任務</button>
+        </div>
+      </div>
+
+      <nav id="taskTabs" class="task-tabs" aria-label="任務週期">
+        <button class="task-tab active" type="button" data-period="daily"><span class="tab-icon">24</span><span>每日任務</span><b id="dailyTabCount">0/0</b></button>
+        <button class="task-tab" type="button" data-period="weekly"><span class="tab-icon">7</span><span>每週任務</span><b id="weeklyTabCount">0/0</b></button>
+        <button class="task-tab" type="button" data-period="monthly"><span class="tab-icon">月</span><span>每月任務</span><b id="monthlyTabCount">0/0</b></button>
+      </nav>
+
+      <div id="taskBoard" class="task-board">
+        <div class="board-meta">
+          <div>
+            <p id="taskPeriodLabel" class="step-label yellow">● DAILY MISSIONS</p>
+            <h3 id="taskBoardTitle">今天要完成的事</h3>
+          </div>
+          <div class="overall-progress"><span id="overallProgressText">0 / 0</span><div><i id="overallProgressBar"></i></div></div>
+        </div>
+        <div id="missionList" class="mission-list"></div>
+        <button id="addMission" class="add-mission hidden" type="button">＋ 新增一項任務</button>
+        <div id="completionSeal" class="completion-seal" aria-live="polite">
+          <div class="seal-check">✓</div>
+          <p>ALL MISSIONS COMPLETE</p>
+          <strong>本期任務<br>全部完成</strong>
+          <small>做得漂亮，現在可以放心休息。</small>
+        </div>
+      </div>
+
+      <footer class="tasks-footer">
+        <p id="periodResetHint">每日任務會在明天自動重置。</p>
+        <div class="footer-actions">
+          <button id="resetCurrentTasks" class="text-button danger" type="button">重置目前進度</button>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
