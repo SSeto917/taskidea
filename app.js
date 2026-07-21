@@ -29,7 +29,7 @@
     toast: $("#toast"), exportData: $("#exportData"), importData: $("#importData"), resetData: $("#resetData"),
     ideaView: $("#ideaView"), tasksView: $("#tasksView"), viewButtons: document.querySelectorAll("[data-view]"),
     taskTabs: $("#taskTabs"), taskBoard: $("#taskBoard"), missionList: $("#missionList"), addMission: $("#addMission"),
-    editTasks: $("#editTasks"), cancelTaskEdit: $("#cancelTaskEdit"), resetCurrentTasks: $("#resetCurrentTasks"),
+    editTasks: $("#editTasks"), addRecurringTask: $("#addRecurringTask"), cancelTaskEdit: $("#cancelTaskEdit"), resetCurrentTasks: $("#resetCurrentTasks"),
     taskPeriodLabel: $("#taskPeriodLabel"), taskBoardTitle: $("#taskBoardTitle"), periodResetHint: $("#periodResetHint"),
     overallProgressText: $("#overallProgressText"), overallProgressBar: $("#overallProgressBar"),
     dailyTabCount: $("#dailyTabCount"), weeklyTabCount: $("#weeklyTabCount"), monthlyTabCount: $("#monthlyTabCount"),
@@ -324,7 +324,7 @@
     els.editTasks.textContent = editingTasks ? "儲存任務" : "編輯任務";
 
     if (!displayItems.length && !editingTasks) {
-      els.missionList.innerHTML = '<div class="mission-empty">這個週期還沒有任務。<br>按右上方「編輯任務」開始建立。</div>';
+      els.missionList.innerHTML = '<div class="mission-empty">這個週期還沒有例行任務。<br>按上方「加入例行任務」開始建立。</div>';
       return;
     }
 
@@ -376,6 +376,15 @@
     editingTasks = false;
     taskDraft = null;
     renderTasks();
+  }
+
+  function appendRecurringTask() {
+    if (!editingTasks) beginTaskEdit();
+    const period = recurringState.active;
+    taskDraft[period].push({ id: id(), title: "", target: 1, current: 0 });
+    renderTasks();
+    const inputs = els.missionList.querySelectorAll('[data-field="title"]');
+    inputs[inputs.length - 1]?.focus();
   }
 
   function handleTaskButton() {
@@ -520,14 +529,9 @@
   });
 
   els.editTasks.addEventListener("click", () => editingTasks ? saveTaskEdit() : beginTaskEdit());
+  els.addRecurringTask.addEventListener("click", appendRecurringTask);
   els.cancelTaskEdit.addEventListener("click", cancelTaskEdit);
-  els.addMission.addEventListener("click", () => {
-    const period = recurringState.active;
-    taskDraft[period].push({ id: id(), title: "", target: 1, current: 0 });
-    renderTasks();
-    const inputs = els.missionList.querySelectorAll('[data-field="title"]');
-    inputs[inputs.length - 1]?.focus();
-  });
+  els.addMission.addEventListener("click", appendRecurringTask);
 
   els.missionList.addEventListener("input", (event) => {
     if (!editingTasks || !event.target.dataset.field) return;

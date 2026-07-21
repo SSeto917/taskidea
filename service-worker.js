@@ -1,4 +1,4 @@
-const CACHE_NAME = "idea-cooling-v18";
+const CACHE_NAME = "idea-cooling-v22";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,6 +7,8 @@ const APP_SHELL = [
   "./firebase-config.js",
   "./firebase-sync.js",
   "./manifest.webmanifest",
+  "./fonts/Cubic_11.woff2",
+  "./fonts/OFL-Cubic-11.txt",
   "./icons/icon.svg",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#10120f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -45,7 +45,7 @@
           <p id="focusTimerTask">目前任務</p>
           <time id="focusElapsed" datetime="PT0S">00:00:00</time>
         </div>
-        <h2 id="heroHeadline">先把想法放下，<br><em>繼續眼前的事。</em></h2>
+        <h2 id="heroHeadline" lang="en">IDEAS CAN WAIT.<br><em>FOCUS ON NOW.</em></h2>
         <p class="lead">突然有想法？只記錄，不執行。讓靈感先離開腦袋，但不要帶走你的注意力。</p>
       </div>
       <div class="current-task-card">
@@ -158,6 +158,7 @@
         </div>
         <div class="task-edit-actions">
           <button id="cancelTaskEdit" class="button button-ghost hidden" type="button">取消</button>
+          <button id="addRecurringTask" class="button button-acid" type="button">＋ 加入例行任務</button>
           <button id="editTasks" class="button button-light" type="button">編輯任務</button>
         </div>
       </div>
@@ -177,7 +178,7 @@
           <div class="overall-progress"><span id="overallProgressText">0 / 0</span><div><i id="overallProgressBar"></i></div></div>
         </div>
         <div id="missionList" class="mission-list"></div>
-        <button id="addMission" class="add-mission hidden" type="button">＋ 新增一項任務</button>
+        <button id="addMission" class="add-mission hidden" type="button">＋ 再加入一項例行任務</button>
         <div id="completionSeal" class="completion-seal" aria-live="polite">
           <div class="seal-check">✓</div>
           <p>ALL MISSIONS COMPLETE</p>
