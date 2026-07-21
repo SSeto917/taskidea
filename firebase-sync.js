@@ -10,6 +10,7 @@ const ui = {
   accountEmail: $("#accountEmail"), syncStatus: $("#syncStatus"), signOut: $("#signOutButton"),
   title: $("#authTitle"), description: $("#authDescription")
 };
+ui.syncNow = $("#syncNowButton");
 
 let auth = null;
 let db = null;
@@ -43,6 +44,7 @@ function showSignedOut() {
   ui.description.textContent = "未登入時，所有內容只留在這台裝置。登入後才會同步到你的私人雲端空間。";
   ui.authButton.classList.remove("signed-in", "syncing");
   ui.authButton.querySelector("b").textContent = "登入";
+  ui.syncNow.classList.add("hidden");
 }
 
 function showSignedIn(user) {
@@ -53,11 +55,15 @@ function showSignedIn(user) {
   ui.accountEmail.textContent = user.email || "已登入";
   ui.authButton.classList.add("signed-in");
   ui.authButton.querySelector("b").textContent = "雲端";
+  ui.syncNow.classList.remove("hidden");
 }
 
 function setSyncStatus(text, busy = false) {
   ui.syncStatus.textContent = text;
   ui.authButton.classList.toggle("syncing", busy);
+  ui.syncNow.disabled = busy;
+  ui.syncNow.classList.toggle("syncing", busy);
+  ui.syncNow.querySelector("b").textContent = busy ? "同步中" : "同步";
   if (!busy && currentUser) ui.authButton.classList.add("signed-in");
 }
 
@@ -131,6 +137,11 @@ async function startCloudSession(user) {
 }
 
 window.addEventListener("idea-cooling:data-changed", scheduleUpload);
+ui.syncNow.addEventListener("click", async () => {
+  clearTimeout(uploadTimer);
+  await uploadSnapshot();
+  bridge()?.notify(currentUser ? "已執行手動雲端同步。" : "請先登入 Firebase。");
+});
 
 const config = window.IDEA_COOLING_FIREBASE_CONFIG;
 if (!configured(config)) {
