@@ -24,6 +24,12 @@ Firebase 雲端同步設定
 將本資料夾 firestore.rules 的內容完整貼到：
 Firestore Database → Rules → Publish。
 
+專案規則頁：
+https://console.firebase.google.com/project/ti20260721/firestore/rules
+
+若使用 Firebase CLI，本資料夾已包含 firebase.json 與 .firebaserc。登入 Firebase CLI 後可執行：
+firebase deploy --only firestore:rules
+
 規則會限制每個登入者只能讀寫 users/{自己的 uid}，不能讀取其他帳號的資料。
 
 五、重新啟動

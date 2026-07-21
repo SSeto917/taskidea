@@ -201,22 +201,29 @@
       <p class="eyebrow">FIREBASE CLOUD SYNC</p>
       <h2 id="authTitle">登入雲端</h2>
       <p id="authDescription" class="auth-description">未登入時，所有內容只留在這台裝置。登入後可自行選擇從雲端讀取，或把本機資料存檔到雲端。</p>
+      <div id="authConnection" class="auth-connection"><span></span> 正在連接 Firebase</div>
 
       <div id="firebaseSetupNotice" class="setup-notice hidden">
         Firebase 尚未設定。請依照資料夾內的「Firebase設定說明.txt」建立專案並填寫設定檔。
       </div>
 
+      <div id="authModeTabs" class="auth-mode-tabs" role="tablist">
+        <button class="active" type="button" data-auth-mode="login" role="tab" aria-selected="true">登入</button>
+        <button type="button" data-auth-mode="register" role="tab" aria-selected="false">建立帳號</button>
+      </div>
       <form id="authForm" class="auth-form">
         <label>電子信箱<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
-        <label>密碼<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="至少 6 個字元"></label>
+        <label>密碼<span class="password-field"><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="至少 6 個字元"><button id="togglePassword" type="button" aria-label="顯示密碼">顯示</button></span></label>
+        <label id="confirmPasswordField" class="hidden">確認密碼<input id="authPasswordConfirm" type="password" autocomplete="new-password" minlength="6" placeholder="再輸入一次密碼"></label>
         <p id="authError" class="auth-error" role="alert"></p>
-        <button id="signInButton" class="button button-light" type="submit">登入並同步</button>
-        <button id="registerButton" class="button button-ghost" type="button">建立新帳號</button>
+        <button id="authSubmitButton" class="button button-light" type="submit">登入</button>
+        <button id="forgotPasswordButton" class="text-button" type="button">忘記密碼？寄送重設信</button>
       </form>
 
       <div id="accountPanel" class="account-panel hidden">
         <div class="account-avatar">✓</div>
         <strong id="accountEmail"></strong>
+        <span id="currentDeviceLabel" class="current-device-label"></span>
         <p id="syncStatus">正在連接雲端……</p>
         <p id="lastCloudSave" class="last-cloud-save">上次雲端存檔：正在查詢……</p>
         <button id="signOutButton" class="button button-ghost" type="button">登出</button>

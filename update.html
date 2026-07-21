@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10120f">
+  <title>更新靈感冷卻</title>
+  <style>
+    *{box-sizing:border-box}body{display:grid;min-height:100vh;margin:0;padding:24px;place-items:center;color:#171914;background:#f2efe6;font-family:"Microsoft JhengHei",system-ui,sans-serif}.card{width:min(480px,100%);padding:42px;border:1px solid #171914;background:#f7f4eb;box-shadow:14px 14px 0 #d8ff3e}.mark{display:grid;width:64px;height:64px;place-items:center;border-radius:50%;color:#d8ff3e;background:#171914;font-size:30px;font-weight:900}h1{margin:22px 0 10px;font-size:34px}p{color:#6f716a;line-height:1.7}.bar{height:6px;margin-top:25px;overflow:hidden;background:#ddd8ca}.bar i{display:block;width:35%;height:100%;background:#171914;animation:move 1s ease-in-out infinite alternate}@keyframes move{to{width:100%}}button{width:100%;margin-top:20px;padding:14px;border:0;color:white;background:#171914;cursor:pointer;font-weight:800}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="mark">↻</div>
+    <h1>正在更新</h1>
+    <p id="status">正在移除舊版 PWA 快取。本機的靈感、任務與設定不會被刪除。</p>
+    <div class="bar" id="bar"><i></i></div>
+    <button id="retry" hidden>重新嘗試</button>
+  </main>
+  <script>
+    async function updateApp() {
+      const status = document.querySelector("#status");
+      const retry = document.querySelector("#retry");
+      try {
+        const registrations = "serviceWorker" in navigator ? await navigator.serviceWorker.getRegistrations() : [];
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+        const keys = "caches" in window ? await caches.keys() : [];
+        await Promise.all(keys.map((key) => caches.delete(key)));
+        status.textContent = "更新完成，正在載入最新版……";
+        setTimeout(() => location.replace(`./?updated=${Date.now()}`), 700);
+      } catch (error) {
+        status.textContent = `更新失敗：${error.message}`;
+        document.querySelector("#bar").hidden = true;
+        retry.hidden = false;
+      }
+    }
+    document.querySelector("#retry").addEventListener("click", updateApp);
+    updateApp();
+  </script>
+</body>
+</html>

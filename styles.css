@@ -182,19 +182,31 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
 .auth-modal { position: relative; width: min(460px, 100%); padding: 42px; border: 1px solid var(--ink); background: var(--paper); box-shadow: 16px 16px 0 rgba(216,255,62,.4); }
 .auth-modal h2 { margin: 7px 0 12px; font-size: 34px; letter-spacing: -.04em; }
 .auth-description { margin: 0 0 25px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.auth-connection { display: flex; align-items: center; gap: 8px; margin: -12px 0 20px; color: var(--muted); font: 700 10px/1 ui-monospace, monospace; }
+.auth-connection span { width: 7px; height: 7px; border-radius: 50%; background: var(--yellow); }
+.auth-connection.ready span { background: var(--green); }
+.auth-connection.error span { background: var(--red); }
 .modal-close { position: absolute; top: 12px; right: 14px; width: 34px; height: 34px; border: 0; color: var(--muted); background: transparent; cursor: pointer; font-size: 26px; }
 .setup-notice { margin-bottom: 20px; padding: 14px; border-left: 4px solid var(--yellow); background: #eee1b6; font-size: 12px; line-height: 1.6; }
 .setup-notice small { display: block; margin-top: 9px; color: var(--muted); }
 .setup-action { display: block; width: 100%; margin-top: 13px; padding: 12px; border: 0; color: white; background: var(--ink); cursor: pointer; font-weight: 800; }
 .auth-form { display: grid; gap: 13px; }
+.auth-mode-tabs { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 18px; border: 1px solid var(--line); }
+.auth-mode-tabs button { padding: 11px; border: 0; color: var(--muted); background: transparent; cursor: pointer; font-size: 12px; font-weight: 800; }
+.auth-mode-tabs button.active { color: white; background: var(--ink); }
 .auth-form label { display: grid; gap: 7px; font-size: 12px; font-weight: 800; }
 .auth-form .button { width: 100%; }
+.password-field { display: flex; border: 1px solid var(--line); background: rgba(255,255,255,.55); }
+.password-field input { border: 0; background: transparent; box-shadow: none; }
+.password-field button { min-width: 58px; border: 0; border-left: 1px solid var(--line); color: var(--muted); background: transparent; cursor: pointer; font-size: 11px; }
+.auth-form > .text-button { justify-self: center; margin-top: 2px; }
 .auth-error { min-height: 18px; margin: 0; color: #9f5046; font-size: 12px; line-height: 1.5; }
 .account-panel { display: grid; place-items: center; gap: 11px; padding-top: 10px; text-align: center; }
 .account-avatar { display: grid; width: 74px; height: 74px; place-items: center; border-radius: 50%; color: var(--ink); background: var(--acid); font-size: 42px; font-weight: 900; }
 .account-panel strong { overflow-wrap: anywhere; }
 .account-panel p { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
 .account-panel .last-cloud-save { width: 100%; margin: -2px 0 10px; padding: 10px 12px; border: 1px solid var(--line); background: rgba(255,255,255,.35); font-weight: 800; }
+.current-device-label { padding: 5px 9px; border: 1px solid var(--line); color: var(--muted); font: 700 10px/1 ui-monospace, monospace; }
 
 /* Recurring missions */
 .tasks-view { padding-top: 58px; }

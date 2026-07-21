@@ -659,6 +659,7 @@
       els.firebaseSetupNotice.classList.remove("hidden");
       els.firebaseSetupNotice.innerHTML = '目前是直接開檔模式，瀏覽器不允許 Firebase 登入。<button id="openLoginVersion" class="setup-action" type="button">開啟可登入版本 →</button><small>若無法開啟，請先雙擊「啟動靈感冷卻.bat」。</small>';
       els.authForm.classList.add("hidden");
+      $("#authModeTabs")?.classList.add("hidden");
       $("#openLoginVersion").addEventListener("click", () => { location.href = "http://localhost:8765/"; });
     }
   }
