@@ -79,6 +79,17 @@ function friendlyError(error) {
   return messages[error?.code] || `操作失敗：${error?.message || "未知錯誤"}`;
 }
 
+function hasLocalContent(snapshot) {
+  const ideas = snapshot?.ideaCooling || {};
+  const recurring = snapshot?.recurringTasks?.items || {};
+  return Boolean(
+    String(ideas.currentTask || "").trim() ||
+    String(ideas.youtubeUrl || "").trim() ||
+    ideas.inbox?.length || ideas.pool?.length || ideas.todos?.length ||
+    recurring.daily?.length || recurring.weekly?.length || recurring.monthly?.length
+  );
+}
+
 async function uploadSnapshot() {
   if (!currentUser || !db || syncBusy || applyingCloud) return;
   const snapshot = bridge()?.getSnapshot();
@@ -109,7 +120,7 @@ async function startCloudSession(user) {
   try {
     const remoteSnapshot = await getDoc(reference);
     const local = bridge()?.getSnapshot();
-    if (remoteSnapshot.exists() && Number(remoteSnapshot.data().clientModifiedAt) > Number(local?.clientModifiedAt || 0)) {
+    if (remoteSnapshot.exists() && (!hasLocalContent(local) || Number(remoteSnapshot.data().clientModifiedAt) > Number(local?.clientModifiedAt || 0))) {
       applyingCloud = true;
       bridge()?.applySnapshot(remoteSnapshot.data());
       applyingCloud = false;

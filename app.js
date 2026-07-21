@@ -90,17 +90,21 @@
 
   function resetExpiredPeriods() {
     let changed = false;
+    let progressChanged = false;
     for (const period of ["daily", "weekly", "monthly"]) {
       const marker = periodKey(period);
       if (recurringState.periodMarkers[period] !== marker) {
-        recurringState.items[period].forEach((task) => { task.current = 0; });
+        recurringState.items[period].forEach((task) => {
+          if (Number(task.current) > 0) progressChanged = true;
+          task.current = 0;
+        });
         recurringState.periodMarkers[period] = marker;
         changed = true;
       }
     }
     if (changed) {
       localStorage.setItem(TASKS_KEY, JSON.stringify(recurringState));
-      markDataChanged();
+      if (progressChanged) markDataChanged();
     }
   }
 
