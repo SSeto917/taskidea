@@ -4,12 +4,14 @@
   const STORAGE_KEY = "idea-cooling-system-v1";
   const UI_KEY = "idea-cooling-ui-v1";
   const TASKS_KEY = "idea-cooling-recurring-tasks-v1";
+  const DATA_META_KEY = "idea-cooling-data-meta-v1";
   const COOLING_MS = 24 * 60 * 60 * 1000;
 
-  const defaultState = () => ({ currentTask: "", isFocusing: false, focusStartedAt: null, inbox: [], pool: [], todos: [] });
+  const defaultState = () => ({ currentTask: "", youtubeUrl: "", isFocusing: false, focusStartedAt: null, inbox: [], pool: [], todos: [] });
   let state = loadState();
   let collapsed = loadCollapsed();
   let recurringState = loadRecurringTasks();
+  let localModifiedAt = Number(localStorage.getItem(DATA_META_KEY)) || 0;
   let editingTasks = false;
   let taskDraft = null;
   let reviewQueue = [];
@@ -17,7 +19,9 @@
 
   const $ = (selector) => document.querySelector(selector);
   const els = {
-    currentTask: $("#currentTask"), taskHint: $("#taskHint"), finishTask: $("#finishTask"),
+    currentTask: $("#currentTask"), youtubeUrl: $("#youtubeUrl"), taskHint: $("#taskHint"), finishTask: $("#finishTask"), finishFocusedTask: $("#finishFocusedTask"),
+    focusSetup: $("#focusSetup"), focusMedia: $("#focusMedia"), youtubePlayer: $("#youtubePlayer"), youtubeEmpty: $("#youtubeEmpty"),
+    focusTimer: $("#focusTimer"), focusTimerTask: $("#focusTimerTask"), focusElapsed: $("#focusElapsed"), heroHeadline: $("#heroHeadline"),
     captureForm: $("#captureForm"), ideaInput: $("#ideaInput"), inboxCount: $("#inboxCount"),
     reviewSection: $("#reviewSection"), reviewCard: $("#reviewCard"), reviewProgress: $("#reviewProgress"),
     poolList: $("#poolList"), poolCount: $("#poolCount"), todoList: $("#todoList"), todoCount: $("#todoCount"),
@@ -28,7 +32,9 @@
     editTasks: $("#editTasks"), cancelTaskEdit: $("#cancelTaskEdit"), resetCurrentTasks: $("#resetCurrentTasks"),
     taskPeriodLabel: $("#taskPeriodLabel"), taskBoardTitle: $("#taskBoardTitle"), periodResetHint: $("#periodResetHint"),
     overallProgressText: $("#overallProgressText"), overallProgressBar: $("#overallProgressBar"),
-    dailyTabCount: $("#dailyTabCount"), weeklyTabCount: $("#weeklyTabCount"), monthlyTabCount: $("#monthlyTabCount")
+    dailyTabCount: $("#dailyTabCount"), weeklyTabCount: $("#weeklyTabCount"), monthlyTabCount: $("#monthlyTabCount"),
+    authButton: $("#authButton"), authModal: $("#authModal"), closeAuthModal: $("#closeAuthModal"),
+    firebaseSetupNotice: $("#firebaseSetupNotice"), authForm: $("#authForm"), authError: $("#authError")
   };
   els.installPwa = $("#installPwa");
   let installPrompt = null;
@@ -92,11 +98,15 @@
         changed = true;
       }
     }
-    if (changed) localStorage.setItem(TASKS_KEY, JSON.stringify(recurringState));
+    if (changed) {
+      localStorage.setItem(TASKS_KEY, JSON.stringify(recurringState));
+      markDataChanged();
+    }
   }
 
   function saveRecurringTasks() {
     localStorage.setItem(TASKS_KEY, JSON.stringify(recurringState));
+    markDataChanged();
     renderTasks();
   }
 
@@ -112,12 +122,20 @@
   function toggleColumn(type) {
     collapsed[type] = !collapsed[type];
     localStorage.setItem(UI_KEY, JSON.stringify(collapsed));
+    markDataChanged();
     renderCollapsed();
   }
 
   function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    markDataChanged();
     render();
+  }
+
+  function markDataChanged() {
+    localModifiedAt = Date.now();
+    localStorage.setItem(DATA_META_KEY, String(localModifiedAt));
+    window.dispatchEvent(new CustomEvent("idea-cooling:data-changed"));
   }
 
   function id() {
@@ -140,6 +158,55 @@
     return `還要 ${hours} 小時 ${minutes} 分`;
   }
 
+  function renderFocusTimer() {
+    if (!state.isFocusing || !state.focusStartedAt) return;
+    const totalSeconds = Math.max(0, Math.floor((Date.now() - state.focusStartedAt) / 1000));
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    els.focusElapsed.textContent = `${hours}:${minutes}:${seconds}`;
+    els.focusElapsed.dateTime = `PT${totalSeconds}S`;
+  }
+
+  function youtubeEmbedUrl(value) {
+    if (!value) return "";
+    try {
+      const url = new URL(value.trim());
+      const host = url.hostname.replace(/^www\./, "");
+      if (!["youtube.com", "m.youtube.com", "youtu.be", "music.youtube.com"].includes(host)) return "";
+      let videoId = "";
+      if (host === "youtu.be") videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+      else if (url.pathname === "/watch") videoId = url.searchParams.get("v") || "";
+      else if (/^\/(shorts|embed)\//.test(url.pathname)) videoId = url.pathname.split("/")[2] || "";
+      const playlistId = url.searchParams.get("list") || "";
+      const safeVideo = /^[\w-]{6,}$/.test(videoId) ? videoId : "";
+      const safeList = /^[\w-]{6,}$/.test(playlistId) ? playlistId : "";
+      const params = new URLSearchParams({ autoplay: "1", playsinline: "1", rel: "0" });
+      if (location.origin.startsWith("http")) params.set("origin", location.origin);
+      if (safeVideo) {
+        params.set("loop", "1");
+        params.set("playlist", safeVideo);
+        if (safeList) params.set("list", safeList);
+        return `https://www.youtube.com/embed/${safeVideo}?${params}`;
+      }
+      if (safeList) {
+        params.set("listType", "playlist");
+        params.set("list", safeList);
+        return `https://www.youtube.com/embed/videoseries?${params}`;
+      }
+    } catch { return ""; }
+    return "";
+  }
+
+  function renderYoutubePlayer() {
+    const embedUrl = state.isFocusing ? youtubeEmbedUrl(state.youtubeUrl) : "";
+    els.youtubeEmpty.classList.toggle("hidden", Boolean(embedUrl));
+    if (els.youtubePlayer.dataset.source !== embedUrl) {
+      els.youtubePlayer.dataset.source = embedUrl;
+      els.youtubePlayer.src = embedUrl || "about:blank";
+    }
+  }
+
   function notify(message) {
     els.toast.textContent = message;
     els.toast.classList.add("show");
@@ -149,9 +216,16 @@
 
   function render() {
     els.currentTask.value = state.currentTask;
+    els.youtubeUrl.value = state.youtubeUrl || "";
     els.currentTask.readOnly = state.isFocusing;
-    els.finishTask.textContent = state.isFocusing ? "我做完了，檢視靈感 →" : "開始專注 →";
+    els.focusTimer.classList.toggle("hidden", !state.isFocusing);
+    els.heroHeadline.classList.toggle("hidden", state.isFocusing);
+    els.focusTimerTask.textContent = state.currentTask || "未命名任務";
+    els.focusSetup.classList.toggle("hidden", state.isFocusing);
+    els.focusMedia.classList.toggle("hidden", !state.isFocusing);
     els.finishTask.closest(".current-task-card").classList.toggle("is-focusing", state.isFocusing);
+    renderFocusTimer();
+    renderYoutubePlayer();
     els.inboxCount.textContent = `${state.inbox.length} 個待檢視`;
     els.poolCount.textContent = state.pool.length;
     els.todoCount.textContent = state.todos.length;
@@ -370,9 +444,17 @@
   els.currentTask.addEventListener("input", () => {
     state.currentTask = els.currentTask.value;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    markDataChanged();
+  });
+
+  els.youtubeUrl.addEventListener("input", () => {
+    state.youtubeUrl = els.youtubeUrl.value.trim();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    markDataChanged();
   });
 
   els.finishTask.addEventListener("click", handleTaskButton);
+  els.finishFocusedTask.addEventListener("click", handleTaskButton);
   els.captureForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const text = els.ideaInput.value.trim();
@@ -426,7 +508,10 @@
     const tab = event.target.closest("[data-period]");
     if (!tab) return;
     recurringState.active = tab.dataset.period;
-    if (!editingTasks) localStorage.setItem(TASKS_KEY, JSON.stringify(recurringState));
+    if (!editingTasks) {
+      localStorage.setItem(TASKS_KEY, JSON.stringify(recurringState));
+      markDataChanged();
+    }
     renderTasks();
   });
 
@@ -474,7 +559,7 @@
   });
 
   els.exportData.addEventListener("click", () => {
-    const backup = { version: 2, ideaCooling: state, recurringTasks: recurringState };
+    const backup = { version: 3, ideaCooling: state, recurringTasks: recurringState, ui: { collapsed }, modifiedAt: localModifiedAt };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -497,6 +582,11 @@
         resetExpiredPeriods();
         saveRecurringTasks();
       }
+      if (imported.ui?.collapsed) {
+        collapsed = { pool: false, todo: false, ...imported.ui.collapsed };
+        localStorage.setItem(UI_KEY, JSON.stringify(collapsed));
+        renderCollapsed();
+      }
       saveState();
       notify("備份已匯入。");
     } catch { notify("這不是有效的靈感冷卻備份。"); }
@@ -514,6 +604,72 @@
     saveState();
     notify("所有資料已清除。");
   });
+
+  function getCloudSnapshot() {
+    return {
+      version: 3,
+      ideaCooling: structuredClone(state),
+      recurringTasks: structuredClone(recurringState),
+      ui: { collapsed: structuredClone(collapsed) },
+      clientModifiedAt: localModifiedAt
+    };
+  }
+
+  function applyCloudSnapshot(payload) {
+    if (!payload?.ideaCooling || !Array.isArray(payload.ideaCooling.inbox) || !Array.isArray(payload.ideaCooling.pool) || !Array.isArray(payload.ideaCooling.todos)) return false;
+    state = { ...defaultState(), ...payload.ideaCooling };
+
+    if (payload.recurringTasks?.items) {
+      const next = defaultRecurringTasks();
+      next.active = ["daily", "weekly", "monthly"].includes(payload.recurringTasks.active) ? payload.recurringTasks.active : "daily";
+      next.periodMarkers = payload.recurringTasks.periodMarkers || {};
+      for (const period of ["daily", "weekly", "monthly"]) {
+        next.items[period] = Array.isArray(payload.recurringTasks.items[period]) ? payload.recurringTasks.items[period] : [];
+      }
+      recurringState = next;
+    }
+    if (payload.ui?.collapsed) collapsed = { pool: false, todo: false, ...payload.ui.collapsed };
+
+    localModifiedAt = Number(payload.clientModifiedAt) || Date.now();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(TASKS_KEY, JSON.stringify(recurringState));
+    localStorage.setItem(UI_KEY, JSON.stringify(collapsed));
+    localStorage.setItem(DATA_META_KEY, String(localModifiedAt));
+    editingTasks = false;
+    taskDraft = null;
+    reviewQueue = [];
+    els.reviewSection.classList.add("hidden");
+    render();
+    renderCollapsed();
+    renderTasks();
+    return true;
+  }
+
+  window.IdeaCoolingCloudBridge = { getSnapshot: getCloudSnapshot, applySnapshot: applyCloudSnapshot, notify };
+  window.dispatchEvent(new CustomEvent("idea-cooling:bridge-ready"));
+
+  function openAuthModal() {
+    els.authModal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+    if (location.protocol === "file:") {
+      els.firebaseSetupNotice.classList.remove("hidden");
+      els.firebaseSetupNotice.innerHTML = '目前是直接開檔模式，瀏覽器不允許 Firebase 登入。<button id="openLoginVersion" class="setup-action" type="button">開啟可登入版本 →</button><small>若無法開啟，請先雙擊「啟動靈感冷卻.bat」。</small>';
+      els.authForm.classList.add("hidden");
+      $("#openLoginVersion").addEventListener("click", () => { location.href = "http://localhost:8765/"; });
+    }
+  }
+
+  function closeAuthModal() {
+    els.authModal.classList.add("hidden");
+    document.body.style.overflow = "";
+    els.authError.textContent = "";
+  }
+
+  els.authButton.addEventListener("click", openAuthModal);
+  els.closeAuthModal.addEventListener("click", closeAuthModal);
+  els.authModal.addEventListener("click", (event) => { if (event.target === els.authModal) closeAuthModal(); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !els.authModal.classList.contains("hidden")) closeAuthModal(); });
+  window.IdeaCoolingAuthUI = { close: closeAuthModal };
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
@@ -550,4 +706,5 @@
   resetExpiredPeriods();
   renderTasks();
   setInterval(renderPool, 60000);
+  setInterval(renderFocusTimer, 1000);
 })();

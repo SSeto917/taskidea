@@ -1,0 +1,46 @@
+Firebase 雲端同步設定
+====================
+
+完成以下設定前，App 仍可正常使用，但資料只會保存在本機，不會上傳。
+
+一、建立 Firebase 專案與 Web App
+-------------------------------
+1. 前往 https://console.firebase.google.com/ 建立 Firebase 專案。
+2. 在專案首頁新增「Web」應用程式。
+3. Firebase 會提供 firebaseConfig，將各欄位內容填入本資料夾的 firebase-config.js。
+
+二、啟用 Email／密碼登入
+-----------------------
+1. Firebase Console → Authentication → Sign-in method。
+2. 啟用「Email/Password」。
+
+三、建立 Firestore
+-----------------
+1. Firebase Console → Firestore Database → Create database。
+2. 選擇適合你的資料庫區域。
+
+四、部署安全規則（重要）
+-----------------------
+將本資料夾 firestore.rules 的內容完整貼到：
+Firestore Database → Rules → Publish。
+
+規則會限制每個登入者只能讀寫 users/{自己的 uid}，不能讀取其他帳號的資料。
+
+五、重新啟動
+-----------
+關閉「靈感冷卻」與啟動器視窗，再雙擊「啟動靈感冷卻.bat」。
+頁面頂部會出現「登入」。建立帳號或登入後，才會開始同步。
+
+同步範圍
+--------
+- 專注任務與暫存靈感
+- Idea Pool 與冷卻時間
+- 待辦事項
+- 每日、每週、每月任務及進度
+- 列表展開／收合狀態
+
+隱私行為
+--------
+- 未登入：只寫入瀏覽器本機儲存空間，不呼叫 Firestore。
+- 已登入：本機變更會同步至 users/{目前登入者 uid}。
+- 登出：立即停止監聽與上傳；本機資料仍會保留。

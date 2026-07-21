@@ -25,6 +25,7 @@
         </div>
       </div>
       <div class="top-actions">
+        <button id="authButton" class="auth-button" type="button"><span></span><b>登入</b></button>
         <nav class="view-switch" aria-label="主要頁面">
           <button class="view-button active" type="button" data-view="ideas">靈感</button>
           <button class="view-button" type="button" data-view="tasks">任務</button>
@@ -37,14 +38,33 @@
     <section class="hero">
       <div>
         <p class="step-label green">● STEP 01 — 專注中</p>
-        <h2>先把想法放下，<br><em>繼續眼前的事。</em></h2>
+        <div id="focusTimer" class="focus-timer hidden" aria-live="polite">
+          <div class="timer-status"><span></span> FOCUS SESSION</div>
+          <p id="focusTimerTask">目前任務</p>
+          <time id="focusElapsed" datetime="PT0S">00:00:00</time>
+        </div>
+        <h2 id="heroHeadline">先把想法放下，<br><em>繼續眼前的事。</em></h2>
         <p class="lead">突然有想法？只記錄，不執行。讓靈感先離開腦袋，但不要帶走你的注意力。</p>
       </div>
       <div class="current-task-card">
-        <label for="currentTask">現在唯一要做的事</label>
-        <div class="task-input-row">
-          <input id="currentTask" autocomplete="off" placeholder="例如：完成企劃第一版">
-          <button id="finishTask" class="button button-light" type="button">開始專注 →</button>
+        <div id="focusSetup">
+          <label for="currentTask">現在唯一要做的事</label>
+          <div class="task-input-row">
+            <input id="currentTask" autocomplete="off" placeholder="例如：完成企劃第一版">
+            <button id="finishTask" class="button button-light" type="button">開始專注 →</button>
+          </div>
+          <label class="youtube-label" for="youtubeUrl">專注 YouTube 影片（選填）</label>
+          <div class="youtube-input-row">
+            <span aria-hidden="true">▶</span>
+            <input id="youtubeUrl" type="url" autocomplete="off" placeholder="貼上影片或播放清單網址">
+          </div>
+        </div>
+        <div id="focusMedia" class="focus-media hidden">
+          <div id="youtubePlayerFrame" class="youtube-player-frame">
+            <iframe id="youtubePlayer" title="專注 YouTube 影片" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <div id="youtubeEmpty" class="youtube-empty">這次沒有設定 YouTube 影片</div>
+          </div>
+          <button id="finishFocusedTask" class="button button-light" type="button">我做完了，檢視靈感 →</button>
         </div>
         <p id="taskHint" class="microcopy">輸入任務並開始專注；等真的做完後，再按一次按鈕。</p>
       </div>
@@ -173,7 +193,37 @@
     </section>
   </main>
 
+  <div id="authModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="auth-modal">
+      <button id="closeAuthModal" class="modal-close" type="button" aria-label="關閉">×</button>
+      <p class="eyebrow">FIREBASE CLOUD SYNC</p>
+      <h2 id="authTitle">登入雲端</h2>
+      <p id="authDescription" class="auth-description">未登入時，所有內容只留在這台裝置。登入後才會同步到你的私人雲端空間。</p>
+
+      <div id="firebaseSetupNotice" class="setup-notice hidden">
+        Firebase 尚未設定。請依照資料夾內的「Firebase設定說明.txt」建立專案並填寫設定檔。
+      </div>
+
+      <form id="authForm" class="auth-form">
+        <label>電子信箱<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
+        <label>密碼<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="至少 6 個字元"></label>
+        <p id="authError" class="auth-error" role="alert"></p>
+        <button id="signInButton" class="button button-light" type="submit">登入並同步</button>
+        <button id="registerButton" class="button button-ghost" type="button">建立新帳號</button>
+      </form>
+
+      <div id="accountPanel" class="account-panel hidden">
+        <div class="account-avatar">✓</div>
+        <strong id="accountEmail"></strong>
+        <p id="syncStatus">正在連接雲端……</p>
+        <button id="signOutButton" class="button button-ghost" type="button">登出</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="firebase-config.js"></script>
   <script src="app.js"></script>
+  <script type="module" src="firebase-sync.js"></script>
 </body>
 </html>

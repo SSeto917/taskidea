@@ -1,8 +1,8 @@
-param([switch]$NoBrowser)
+param([switch]$NoBrowser, [int]$Port = 8765)
 
 $ErrorActionPreference = "Stop"
 $appRoot = [System.IO.Path]::GetFullPath($PSScriptRoot)
-$address = "http://localhost:8765/"
+$address = "http://localhost:$Port/"
 $mimeTypes = @{
     ".html" = "text/html; charset=utf-8"
     ".css" = "text/css; charset=utf-8"
@@ -14,7 +14,7 @@ $mimeTypes = @{
     ".txt" = "text/plain; charset=utf-8"
 }
 
-$listener = New-Object System.Net.Sockets.TcpListener -ArgumentList ([System.Net.IPAddress]::Loopback, 8765)
+$listener = New-Object System.Net.Sockets.TcpListener -ArgumentList ([System.Net.IPAddress]::Loopback, $Port)
 
 try {
     $listener.Start()
