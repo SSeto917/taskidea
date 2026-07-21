@@ -26,7 +26,8 @@
       </div>
       <div class="top-actions">
         <button id="authButton" class="auth-button" type="button"><span></span><b>登入</b></button>
-        <button id="syncNowButton" class="sync-now-button hidden" type="button" title="立即同步到 Firebase"><span aria-hidden="true">↻</span><b>同步</b></button>
+        <button id="loadCloudButton" class="sync-now-button hidden" type="button" title="從 Firebase 讀取"><span aria-hidden="true">↓</span><b>讀取</b></button>
+        <button id="saveCloudButton" class="sync-now-button hidden" type="button" title="存檔到 Firebase"><span aria-hidden="true">↑</span><b>存檔</b></button>
         <nav class="view-switch" aria-label="主要頁面">
           <button class="view-button active" type="button" data-view="ideas">靈感</button>
           <button class="view-button" type="button" data-view="tasks">任務</button>
@@ -199,7 +200,7 @@
       <button id="closeAuthModal" class="modal-close" type="button" aria-label="關閉">×</button>
       <p class="eyebrow">FIREBASE CLOUD SYNC</p>
       <h2 id="authTitle">登入雲端</h2>
-      <p id="authDescription" class="auth-description">未登入時，所有內容只留在這台裝置。登入後才會同步到你的私人雲端空間。</p>
+      <p id="authDescription" class="auth-description">未登入時，所有內容只留在這台裝置。登入後可自行選擇從雲端讀取，或把本機資料存檔到雲端。</p>
 
       <div id="firebaseSetupNotice" class="setup-notice hidden">
         Firebase 尚未設定。請依照資料夾內的「Firebase設定說明.txt」建立專案並填寫設定檔。
@@ -217,6 +218,7 @@
         <div class="account-avatar">✓</div>
         <strong id="accountEmail"></strong>
         <p id="syncStatus">正在連接雲端……</p>
+        <p id="lastCloudSave" class="last-cloud-save">上次雲端存檔：正在查詢……</p>
         <button id="signOutButton" class="button button-ghost" type="button">登出</button>
       </div>
     </div>
