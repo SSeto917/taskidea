@@ -273,6 +273,7 @@
   }
 
   function render() {
+    document.body.classList.toggle("focus-mode", state.isFocusing);
     els.currentTask.value = state.currentTask;
     els.youtubeUrl.value = state.youtubeUrl || "";
     els.currentTask.readOnly = state.isFocusing;

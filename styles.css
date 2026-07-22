@@ -117,6 +117,14 @@ button, label[for="importData"] { -webkit-tap-highlight-color: transparent; }
 .timer-status span { display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--green); animation: pulse 1s infinite alternate; }
 .focus-timer p { position: relative; z-index: 1; margin: 19px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(17px, 2.2vw, 25px); font-weight: 800; }
 .focus-timer time { position: relative; z-index: 1; display: block; margin-top: 15px; color: var(--acid); font: 800 clamp(42px, 6vw, 70px)/1 ui-monospace, "Consolas", monospace; letter-spacing: .02em; font-variant-numeric: tabular-nums; text-shadow: 0 0 22px rgba(216,255,62,.24); }
+.focus-mode .hero { grid-template-columns: minmax(0, 860px); justify-content: center; gap: 0; padding-top: 58px; }
+.focus-mode .hero > div:first-child { display: contents; }
+.focus-mode .hero .step-label, .focus-mode .hero .lead, .focus-mode #taskHint { display: none; }
+.focus-mode .focus-timer { width: 100%; max-width: none; border-bottom: 0; box-shadow: none; }
+.focus-mode .current-task-card.is-focusing { padding: 0; border: 0; outline: 1px solid rgba(216,255,62,.4); outline-offset: -1px; background: var(--ink); box-shadow: var(--shadow); }
+.focus-mode .focus-media { gap: 0; }
+.focus-mode .youtube-player-frame { min-height: 0; border-top: 1px solid rgba(216,255,62,.18); }
+.focus-mode .focus-media .button { min-height: 58px; border-top: 1px solid rgba(216,255,62,.28); }
 input, textarea { width: 100%; border: 1px solid var(--line); border-radius: 0; outline: 0; color: var(--ink); background: rgba(255,255,255,.55); transition: border .2s, box-shadow .2s; }
 input:focus, textarea:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(216,255,62,.45); }
 input { padding: 13px 14px; }
@@ -351,6 +359,8 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
   .hero h2 { font-size: 45px; }
   .task-input-row { flex-direction: column; }
   .focus-timer { min-height: 175px; padding: 24px 20px; }
+  .focus-mode .hero { gap: 0; padding-top: 42px; }
+  .focus-mode .focus-timer { min-height: 175px; }
   .focus-timer p { white-space: normal; }
   .section-heading h3, .column h3 { font-size: 24px; }
   .review-actions .button { width: 100%; }
