@@ -7,7 +7,7 @@
   const DATA_META_KEY = "idea-cooling-data-meta-v1";
   const COOLING_MS = 24 * 60 * 60 * 1000;
 
-  const defaultState = () => ({ currentTask: "", youtubeUrl: "", isFocusing: false, focusStartedAt: null, inbox: [], pool: [], todos: [] });
+  const defaultState = () => ({ currentTask: "", youtubeUrl: "", isFocusing: false, focusStartedAt: null, totalFocusMs: 0, completedFocusCount: 0, focusSessions: [], inbox: [], pool: [], todos: [] });
   let state = loadState();
   let collapsed = loadCollapsed();
   let recurringState = loadRecurringTasks();
@@ -22,6 +22,7 @@
     currentTask: $("#currentTask"), youtubeUrl: $("#youtubeUrl"), taskHint: $("#taskHint"), finishTask: $("#finishTask"), finishFocusedTask: $("#finishFocusedTask"),
     focusSetup: $("#focusSetup"), focusMedia: $("#focusMedia"), youtubePlayer: $("#youtubePlayer"), youtubeEmpty: $("#youtubeEmpty"),
     focusTimer: $("#focusTimer"), focusTimerTask: $("#focusTimerTask"), focusElapsed: $("#focusElapsed"), heroHeadline: $("#heroHeadline"),
+    totalFocusTime: $("#totalFocusTime"), todayFocusTime: $("#todayFocusTime"), focusSessionCount: $("#focusSessionCount"), focusSessionList: $("#focusSessionList"),
     captureForm: $("#captureForm"), ideaInput: $("#ideaInput"), inboxCount: $("#inboxCount"),
     reviewSection: $("#reviewSection"), reviewCard: $("#reviewCard"), reviewProgress: $("#reviewProgress"),
     poolList: $("#poolList"), poolCount: $("#poolCount"), todoList: $("#todoList"), todoCount: $("#todoCount"),
@@ -172,6 +173,59 @@
     els.focusElapsed.dateTime = `PT${totalSeconds}S`;
   }
 
+  function durationParts(milliseconds, minimumHourDigits = 2) {
+    const totalSeconds = Math.max(0, Math.floor((Number(milliseconds) || 0) / 1000));
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(minimumHourDigits, "0");
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    return { totalSeconds, text: `${hours}:${minutes}:${seconds}` };
+  }
+
+  function renderFocusLedger() {
+    const sessions = Array.isArray(state.focusSessions) ? state.focusSessions : [];
+    const total = durationParts(state.totalFocusMs, 3);
+    const todayKey = localDateKey(new Date());
+    const todayMs = sessions.reduce((sum, session) => {
+      return localDateKey(new Date(Number(session.endedAt) || 0)) === todayKey ? sum + (Number(session.durationMs) || 0) : sum;
+    }, 0);
+    const today = durationParts(todayMs);
+    els.totalFocusTime.textContent = total.text;
+    els.totalFocusTime.dateTime = `PT${total.totalSeconds}S`;
+    els.todayFocusTime.textContent = today.text;
+    els.todayFocusTime.dateTime = `PT${today.totalSeconds}S`;
+    els.focusSessionCount.textContent = String(Number(state.completedFocusCount) || sessions.length).padStart(3, "0");
+
+    if (!sessions.length) {
+      els.focusSessionList.innerHTML = '<div class="ledger-empty">NO COMPLETED SESSION YET<br><span>完成專注任務後，時間會記錄在這裡。</span></div>';
+      return;
+    }
+    els.focusSessionList.innerHTML = sessions.slice(0, 6).map((session) => {
+      const elapsed = durationParts(session.durationMs);
+      return `<div class="ledger-log-row">
+        <time datetime="${new Date(Number(session.endedAt) || 0).toISOString()}">${escapeHtml(formatDate(session.endedAt))}</time>
+        <span title="${escapeHtml(session.task || "未命名任務")}">${escapeHtml(session.task || "未命名任務")}</span>
+        <strong>+${elapsed.text}</strong>
+      </div>`;
+    }).join("");
+  }
+
+  function completeFocusSession() {
+    if (!state.isFocusing) return;
+    const endedAt = Date.now();
+    const startedAt = Number(state.focusStartedAt) || endedAt;
+    const durationMs = Math.max(0, endedAt - startedAt);
+    const task = state.currentTask.trim() || "未命名任務";
+    if (!Array.isArray(state.focusSessions)) state.focusSessions = [];
+    state.focusSessions.unshift({ id: id(), task, startedAt, endedAt, durationMs });
+    state.focusSessions = state.focusSessions.slice(0, 200);
+    state.totalFocusMs = Math.max(0, Number(state.totalFocusMs) || 0) + durationMs;
+    state.completedFocusCount = Math.max(0, Number(state.completedFocusCount) || 0) + 1;
+    state.currentTask = "";
+    state.isFocusing = false;
+    state.focusStartedAt = null;
+    saveState();
+  }
+
   function youtubeEmbedUrl(value) {
     if (!value) return "";
     try {
@@ -233,6 +287,7 @@
     els.inboxCount.textContent = `${state.inbox.length} 個待檢視`;
     els.poolCount.textContent = state.pool.length;
     els.todoCount.textContent = state.todos.length;
+    renderFocusLedger();
     els.taskHint.textContent = state.isFocusing
       ? `專注進行中${state.focusStartedAt ? ` · ${formatDate(state.focusStartedAt)} 開始` : ""}。做完以前，靈感只放進暫存區。`
       : state.currentTask
@@ -401,12 +456,9 @@
       els.ideaInput.focus();
       return;
     }
+    completeFocusSession();
     if (!state.inbox.length) {
       notify("任務完成。這次沒有需要檢視的靈感。");
-      state.currentTask = "";
-      state.isFocusing = false;
-      state.focusStartedAt = null;
-      saveState();
       return;
     }
     reviewQueue = state.inbox.slice();
@@ -715,5 +767,6 @@
   resetExpiredPeriods();
   renderTasks();
   setInterval(renderPool, 60000);
+  setInterval(renderFocusLedger, 60000);
   setInterval(renderFocusTimer, 1000);
 })();

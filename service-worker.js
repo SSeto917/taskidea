@@ -1,4 +1,4 @@
-const CACHE_NAME = "idea-cooling-v22";
+const CACHE_NAME = "idea-cooling-v23";
 const APP_SHELL = [
   "./",
   "./index.html",

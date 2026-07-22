@@ -125,6 +125,27 @@ input:read-only { color: var(--muted); background: var(--paper-deep); cursor: de
 .current-task-card.is-focusing .button-light { background: #588d29; }
 .microcopy, .shortcut { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
 
+.focus-ledger { position: relative; margin-bottom: 70px; padding: 30px; overflow: hidden; border: 1px solid rgba(216,255,62,.42); color: #f5f7ee; background: #11140f; box-shadow: var(--shadow); }
+.focus-ledger::before { position: absolute; inset: 0; pointer-events: none; content: ""; background: repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0, rgba(255,255,255,.018) 1px, transparent 1px, transparent 4px); }
+.ledger-header, .ledger-stats, .ledger-log-header, .ledger-log { position: relative; z-index: 1; }
+.ledger-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.ledger-kicker { margin: 0 0 9px; color: #8da96d; font: 800 9px/1 ui-monospace, monospace; letter-spacing: .18em; }
+.ledger-kicker span { display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 12px rgba(216,255,62,.8); }
+.focus-ledger h3 { margin: 0; font-family: "Cubic 11", ui-monospace, monospace; font-size: 28px; font-weight: 400; letter-spacing: .08em; }
+.ledger-state { color: #ee7364; font: 800 10px/1 ui-monospace, monospace; letter-spacing: .12em; }
+.ledger-stats { display: grid; grid-template-columns: 1.6fr 1fr .7fr; gap: 1px; margin-top: 25px; border: 1px solid rgba(216,255,62,.22); background: rgba(216,255,62,.18); }
+.ledger-stat { min-width: 0; padding: 19px 20px; background: #171b14; }
+.ledger-stat small { display: block; margin-bottom: 11px; color: #7f9270; font: 800 8px/1 ui-monospace, monospace; letter-spacing: .17em; }
+.ledger-stat time, .ledger-stat strong { display: block; overflow: hidden; color: var(--acid); font: 400 clamp(25px, 3.3vw, 45px)/1 "Cubic 11", ui-monospace, monospace; letter-spacing: .035em; white-space: nowrap; text-shadow: 0 0 16px rgba(216,255,62,.22); }
+.ledger-log-header { display: grid; grid-template-columns: 1fr auto; margin-top: 24px; padding: 0 12px 9px; color: #718064; font: 800 8px/1 ui-monospace, monospace; letter-spacing: .15em; }
+.ledger-log { border-top: 1px solid rgba(216,255,62,.18); }
+.ledger-log-row { display: grid; grid-template-columns: 118px minmax(0,1fr) auto; gap: 16px; align-items: center; padding: 12px; border-bottom: 1px solid rgba(216,255,62,.12); font-size: 12px; }
+.ledger-log-row time { color: #7f9270; font: 700 10px/1 ui-monospace, monospace; }
+.ledger-log-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ledger-log-row strong { color: var(--acid); font: 400 15px/1 "Cubic 11", ui-monospace, monospace; white-space: nowrap; }
+.ledger-empty { padding: 28px 12px; color: #68745f; text-align: center; font: 400 15px/1.7 "Cubic 11", ui-monospace, monospace; letter-spacing: .05em; }
+.ledger-empty span { font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif; font-size: 11px; letter-spacing: 0; }
+
 .button { border: 0; padding: 13px 18px; cursor: pointer; font-weight: 800; white-space: nowrap; transition: transform .15s, filter .15s; }
 .button:hover { transform: translateY(-2px); filter: brightness(.98); }
 .button:active { transform: translateY(0); }
@@ -291,6 +312,8 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
   .capture-panel { grid-template-columns: 1fr; }
   .panel-number { display: none; }
   .capture-content, .review-section, .column { padding: 30px 24px; }
+  .ledger-stats { grid-template-columns: 1fr 1fr; }
+  .ledger-total { grid-column: 1 / -1; }
   .capture-form { grid-template-columns: 1fr; }
   .capture-form button { min-height: 50px; }
   .column-controls { gap: 9px; }
@@ -335,6 +358,11 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
   .overall-progress { width: 100%; text-align: left; }
   .completion-seal { width: min(260px, calc(100% - 40px)); }
   .auth-modal { padding: 34px 24px; }
+  .focus-ledger { margin-bottom: 54px; padding: 24px 20px; }
+  .ledger-log-row { grid-template-columns: minmax(0,1fr) auto; gap: 7px 12px; }
+  .ledger-log-row time { grid-column: 1 / -1; }
+  .ledger-stat { padding: 16px 12px; }
+  .ledger-stat time, .ledger-stat strong { font-size: clamp(22px, 8vw, 34px); }
   .task-edit-actions { display: grid; grid-template-columns: 1fr; }
   .task-edit-actions .button { width: 100%; }
 }

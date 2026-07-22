@@ -72,6 +72,32 @@
       </div>
     </section>
 
+    <section class="focus-ledger" aria-labelledby="focusLedgerTitle">
+      <div class="ledger-header">
+        <div>
+          <p class="ledger-kicker"><span></span> FOCUS TIME MEMORY</p>
+          <h3 id="focusLedgerTitle">累積時間表</h3>
+        </div>
+        <div class="ledger-state">REC ●</div>
+      </div>
+      <div class="ledger-stats">
+        <div class="ledger-stat ledger-total">
+          <small>TOTAL FOCUS</small>
+          <time id="totalFocusTime" datetime="PT0S">000:00:00</time>
+        </div>
+        <div class="ledger-stat">
+          <small>TODAY</small>
+          <time id="todayFocusTime" datetime="PT0S">00:00:00</time>
+        </div>
+        <div class="ledger-stat">
+          <small>SESSIONS</small>
+          <strong id="focusSessionCount">000</strong>
+        </div>
+      </div>
+      <div class="ledger-log-header"><span>COMPLETED TASK</span><span>ELAPSED</span></div>
+      <div id="focusSessionList" class="ledger-log" aria-live="polite"></div>
+    </section>
+
     <section class="capture-panel" aria-labelledby="captureTitle">
       <div class="panel-number">01</div>
       <div class="capture-content">
