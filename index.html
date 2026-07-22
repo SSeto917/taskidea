@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#10120f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -83,18 +83,18 @@
       <div class="ledger-stats">
         <div class="ledger-stat ledger-total">
           <small>TOTAL FOCUS</small>
-          <time id="totalFocusTime" datetime="PT0S">000:00:00</time>
+          <div class="ledger-value"><time id="totalFocusTime" datetime="PT0S">000000</time><span>SEC</span></div>
         </div>
         <div class="ledger-stat">
           <small>TODAY</small>
-          <time id="todayFocusTime" datetime="PT0S">00:00:00</time>
+          <div class="ledger-value"><time id="todayFocusTime" datetime="PT0S">000000</time><span>SEC</span></div>
         </div>
         <div class="ledger-stat">
           <small>SESSIONS</small>
           <strong id="focusSessionCount">000</strong>
         </div>
       </div>
-      <div class="ledger-log-header"><span>COMPLETED TASK</span><span>ELAPSED</span></div>
+      <div class="ledger-log-header"><span>COMPLETED TASK</span><span>SECONDS</span></div>
       <div id="focusSessionList" class="ledger-log" aria-live="polite"></div>
     </section>
 

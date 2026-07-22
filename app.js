@@ -173,22 +173,19 @@
     els.focusElapsed.dateTime = `PT${totalSeconds}S`;
   }
 
-  function durationParts(milliseconds, minimumHourDigits = 2) {
+  function durationSeconds(milliseconds, minimumDigits = 6) {
     const totalSeconds = Math.max(0, Math.floor((Number(milliseconds) || 0) / 1000));
-    const hours = String(Math.floor(totalSeconds / 3600)).padStart(minimumHourDigits, "0");
-    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
-    const seconds = String(totalSeconds % 60).padStart(2, "0");
-    return { totalSeconds, text: `${hours}:${minutes}:${seconds}` };
+    return { totalSeconds, text: String(totalSeconds).padStart(minimumDigits, "0") };
   }
 
   function renderFocusLedger() {
     const sessions = Array.isArray(state.focusSessions) ? state.focusSessions : [];
-    const total = durationParts(state.totalFocusMs, 3);
+    const total = durationSeconds(state.totalFocusMs);
     const todayKey = localDateKey(new Date());
     const todayMs = sessions.reduce((sum, session) => {
       return localDateKey(new Date(Number(session.endedAt) || 0)) === todayKey ? sum + (Number(session.durationMs) || 0) : sum;
     }, 0);
-    const today = durationParts(todayMs);
+    const today = durationSeconds(todayMs);
     els.totalFocusTime.textContent = total.text;
     els.totalFocusTime.dateTime = `PT${total.totalSeconds}S`;
     els.todayFocusTime.textContent = today.text;
@@ -200,11 +197,11 @@
       return;
     }
     els.focusSessionList.innerHTML = sessions.slice(0, 6).map((session) => {
-      const elapsed = durationParts(session.durationMs);
+      const elapsed = durationSeconds(session.durationMs);
       return `<div class="ledger-log-row">
         <time datetime="${new Date(Number(session.endedAt) || 0).toISOString()}">${escapeHtml(formatDate(session.endedAt))}</time>
         <span title="${escapeHtml(session.task || "未命名任務")}">${escapeHtml(session.task || "未命名任務")}</span>
-        <strong>+${elapsed.text}</strong>
+        <strong>+${elapsed.text}<small> SEC</small></strong>
       </div>`;
     }).join("");
   }
